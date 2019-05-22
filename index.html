@@ -1,0 +1,214 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Spinning shapes</title>
+    <style type="text/css">
+      a {
+        margin: 3px;
+        padding: 10px;
+        font-size: 20px;
+        text-shadow: 0px 0px 10px #f60;
+      }
+      #spins {
+        width: 550px;
+        height: 550px;
+        margin: auto;
+        margin-top:137px;
+      }
+      @-webkit-keyframes clock  { 100% {-webkit-transform: rotate(360deg);}}
+      @-moz-keyframes clock  { 100% {-moz-transform:rotate(360deg);}}
+      @-ms-keyframes clock { 100% {-ms-transform:rotate(360deg);}}
+      @keyframes clock { 100% {transform:rotate(360deg);}}
+      
+      @-webkit-keyframes cclock  { 100% {-webkit-transform: rotate(-360deg);}}
+      @-moz-keyframes cclock  { 100% {-moz-transform:rotate(-360deg);}}
+      @-ms-keyframes cclock { 100% {-ms-transform:rotate(-360deg);}}
+      @keyframes cclock { 100% {transform:rotate(-360deg);}}
+      
+      
+      .clock {
+        -webkit-animation: clock linear infinite;
+        -moz-animation: clock linear infinite;
+        -ms-animation: clock linear infinite;
+        animation: clock linear infinite;
+      }
+      .cclock {
+        -webkit-animation: cclock linear infinite;
+        -moz-animation: cclock linear infinite;
+        -ms-animation: cclock linear infinite;
+        animation: cclock linear infinite;
+      }
+      
+      .spinner {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        -webkit-animation-duration: 5s;
+        -moz-animation-duration: 5s;
+        -ms-animation-duration: 5s;
+        animation-duration: 5s;
+        background-image: url('spinner1.png');
+      }
+      a {
+        cursor: pointer;
+      }
+    </style>
+    <script type="text/javascript">
+    var speed = 5;
+    var spinner = 1;
+    var spinner_max = 8;
+    var bgdark = false;
+    </script>
+  </head>
+  <body>
+    <div id="menu">
+      <a id="faster">Spin faster</a>
+      <a id="slower">Spin slower</a>
+      <a id="reverse">Reverse spin direction</a>
+      <a id="clock">Spin all clockwise</a>
+      <a id="cclock">Spin all counter-clockwise</a>
+      <a id="randdir">Randomize spin direction</a>
+      <a id="prev">Previous spinner</a>
+      <a id="next">Next spinner</a>
+      <a id="randcolor">Randomize color</a>
+      <a id="bgcolor">Change background color</a>
+      <a id="spinspin">Spin the spinner</a>
+    </div>
+    <div id="spins"></div>
+    <script type="text/javascript">
+      var len = 25*25;
+      for(var i=0;i<len;i++){
+        var elem = document.createElement('div');
+        elem.className = "spinner " +(Math.floor(Math.random()*10) % 2 == 0 ? "clock":"cclock")+" s"+speed;
+        var c = "rgb(" + Math.floor(Math.random()*255) + ", " + Math.floor(Math.random()*255) + ", " + Math.floor(Math.random()*255) + ")";
+        elem.style.backgroundColor = c;
+        document.getElementById('spins').appendChild(elem);
+      }
+      document.getElementById('faster').addEventListener('click',function(){
+        if( speed < 1 ){
+          speed = speed/2;
+        }
+        else {
+          speed -= 0.5;
+        }
+        [].slice.call(document.styleSheets[0].cssRules).forEach(function(x){
+          if(x.selectorText=='.spinner'){
+            x.style.animationDuration = ''+speed + "s";
+          }
+        });
+      });
+      document.getElementById('slower').addEventListener('click',function(){
+        if( speed < 0.5 ) {
+          speed = 0;
+        }
+        speed += 0.5;
+        [].slice.call(document.styleSheets[0].cssRules).forEach(function(x){
+          if(x.selectorText=='.spinner'){
+            x.style.animationDuration = speed + "s";
+          }
+        });
+      });
+      document.getElementById('reverse').addEventListener('click',function(){
+        [].slice.call(document.getElementsByClassName('spinner')).forEach(function(elem){
+          elem.className = elem.className.replace("cclock", "x");
+          elem.className = elem.className.replace("clock", "cclock");
+          elem.className = elem.className.replace("x", "clock");
+        });
+      });
+      document.getElementById('clock').addEventListener('click',function(){
+        [].slice.call(document.getElementsByClassName('spinner')).forEach(function(elem){
+          elem.className = elem.className.replace("cclock", "clock");
+        });
+      });
+      document.getElementById('cclock').addEventListener('click',function(){
+        [].slice.call(document.getElementsByClassName('spinner')).forEach(function(elem){
+          elem.className = elem.className.replace("cclock", "x");
+          elem.className = elem.className.replace("clock", "cclock");
+          elem.className = elem.className.replace("x", "cclock");
+        });
+      });
+      document.getElementById('randdir').addEventListener('click',function(){
+        [].slice.call(document.getElementsByClassName('spinner')).forEach(function(elem){
+          elem.className = elem.className.replace("cclock", "");
+          elem.className = elem.className.replace("clock", "");
+          if( Math.floor(Math.random()*10) % 2 == 0 )
+            elem.className += " cclock";
+          else
+            elem.className += " clock";
+        });
+      });
+      document.getElementById('next').addEventListener('click',function(){
+        var tmp = spinner;
+        if(spinner == spinner_max)
+          spinner = 0;
+        spinner++;
+        
+        changeSpinner();
+      });
+      document.getElementById('prev').addEventListener('click',function(){
+        var tmp = spinner;
+        if(spinner == 1)
+          spinner = spinner_max+1;
+        spinner--;
+        
+        changeSpinner();
+      });
+      document.getElementById('randcolor').addEventListener('click',function(){
+        [].slice.call(document.getElementsByClassName('spinner')).forEach(function(elem){
+          elem.style.backgroundColor = "rgb(" + Math.floor(Math.random()*255) + ", " + Math.floor(Math.random()*255) + ", " + Math.floor(Math.random()*255) + ")";
+        });
+      });
+      
+      document.getElementById('bgcolor').addEventListener('click',function(){
+        if(!bgdark){
+          bgdark = true;
+          document.body.style.color = 'white';
+          document.body.style.backgroundColor = 'black';
+        }
+        else{
+          bgdark = false;
+          document.body.style.color = 'black';
+          document.body.style.backgroundColor = 'white';
+        }
+        changeSpinner();
+      });
+      
+      document.getElementById('spinspin').addEventListener('click',function(){
+        [].slice.call(document.styleSheets[0].cssRules).forEach(function(x){
+          if(x.selectorText=='#spins'){
+            x.style.animation = "clock linear 60s infinite";
+          }
+        });
+      });
+      
+      function changeSpinner(){
+        var sp = (bgdark ? getDarkBgImg() : 'spinner'+spinner+'.png');
+        [].slice.call(document.styleSheets[0].cssRules).forEach(function(x){
+          if(x.selectorText=='.spinner'){
+            x.style.background = 'url(' + sp + ')';
+          }
+        });
+      }
+      
+      function getDarkBgImg(){
+        var canvas = document.createElement('canvas');
+        canvas.width=canvas.height=22;
+        var ctx = canvas.getContext('2d');
+        var image = document.createElement('img');
+        image.src = 'spinner'+spinner+'.png';
+        ctx.drawImage(image, 0, 0);
+        var imgd = ctx.getImageData(0, 0, 22, 22);
+        var pix = imgd.data;
+        var color = [0,0,0];
+        for(var i=0, n=pix.length;i<n; i+=4){
+          pix[i] = color[0];
+          pix[i+1] = color[1];
+          pix[i+2] = color[2];
+        }
+        ctx.putImageData(imgd, 0, 0);
+        var dataUrl = canvas.toDataURL('image/png');
+        return dataUrl;
+      }
+    </script>
+  </body>
+</html>
